@@ -1,8 +1,10 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { AIDiagnosisResponse } from "../types";
 
+// Analyze HVAC issues using Gemini AI
 export const analyzeIssue = async (description: string): Promise<AIDiagnosisResponse> => {
   try {
+    // Create a new instance right before use as recommended for the latest context
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
@@ -28,14 +30,16 @@ export const analyzeIssue = async (description: string): Promise<AIDiagnosisResp
       }
     });
 
-    if (response.text) {
-      return JSON.parse(response.text) as AIDiagnosisResponse;
+    // The text property returns the string output; it must be trimmed before parsing JSON as per guidelines
+    const jsonStr = response.text?.trim();
+    if (jsonStr) {
+      return JSON.parse(jsonStr) as AIDiagnosisResponse;
     }
     
     throw new Error("No response text");
   } catch (error) {
     console.error("Error analyzing issue:", error);
-    // Fallback safe response
+    // Fallback safe response for operational continuity
     return {
       category: "General",
       severity: "Media",
