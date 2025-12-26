@@ -3,20 +3,7 @@ import { AIDiagnosisResponse } from "../types";
 
 export const analyzeIssue = async (description: string): Promise<AIDiagnosisResponse> => {
   try {
-    // @ts-ignore: Check if process is defined to prevent browser crashes
-    const apiKey = typeof process !== "undefined" && process.env ? process.env.API_KEY : undefined;
-
-    // Use a fallback if API key is not present, instead of crashing or erroring out
-    if (!apiKey) {
-      console.warn("API Key not found or process.env missing. Using fallback diagnosis.");
-      return {
-        category: "Pendiente de Análisis",
-        severity: "Media",
-        advice: "Le recomendamos apagar el equipo y esperar a que el Ing. Alan o el Ing. Juan lo contacten."
-      };
-    }
-
-    const ai = new GoogleGenAI({ apiKey });
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: `Un cliente de una empresa de reparación de aire acondicionado (IGLUMEX) reporta el siguiente problema: "${description}".
